@@ -21,7 +21,7 @@ namespace AnalyzeFiles.Controllers
             filesLocation = ConfigurationManager.AppSettings["filesLocationFolder"];
             listSeparator = CultureInfo.CurrentCulture.TextInfo.ListSeparator.ToCharArray().First();
         }
-        // GET: AnalyzedFiles
+        
         public ActionResult Index()
         {
             return View();
@@ -30,6 +30,7 @@ namespace AnalyzeFiles.Controllers
         public ActionResult Analyze()
         {            
             var model = AnalyzeFilesInFolder();
+            
             return View(model);
         }
 
@@ -46,7 +47,10 @@ namespace AnalyzeFiles.Controllers
                 var files = Directory.GetFiles(filesLocation);
                 foreach(var file in files)
                 {
-                    filesInfo.Add(AnalyzeFile(file));
+                    if (IsFileChanged(file))
+                    {
+                        filesInfo.Add(AnalyzeFile(file));
+                    }                    
                 }
             }
             return filesInfo;
@@ -55,21 +59,34 @@ namespace AnalyzeFiles.Controllers
         private AnalyzedFileInfo AnalyzeFile(string file)
         {
             AnalyzedFileInfo analyzedFileInfo = new AnalyzedFileInfo();
-            var listSeparator = CultureInfo.CurrentCulture.TextInfo.ListSeparator.ToCharArray().First();
+            if (repository.AnalyzedFilesInfo.Any(f => f.Name == file))
+            {
+                analyzedFileInfo = repository.AnalyzedFilesInfo.First(f => f.Name == file);
+            }
+               
             if (IsFileCSV(file))
             {                
-                var lines = System.IO.File.ReadAllLines(file);
+                var history = new AnalyzedFileHistoryInfo();
+                history.CreatedDate = DateTime.Now;
+
+                var lines = System.IO.File.ReadAllLines(file);                
                 analyzedFileInfo.Name = file;
                 analyzedFileInfo.IsFileCSV = true;
                 analyzedFileInfo.Rows = lines.Count();
+                analyzedFileInfo.FileHistory.Add(history);
 
                 List<Dictionary<string, int>> list = new List<Dictionary<string, int>>();
-
+                
                 for (int l = 0; l < lines.Count(); l++)
                 {
+                    
                     var columns = lines[l].Split(listSeparator);
                     for (int i = 0; i < columns.Count(); i++)
                     {
+                        AnalyzedFileColumnHistoryInfo columnHistoryInfo = new AnalyzedFileColumnHistoryInfo();
+                        columnHistoryInfo.Position = i;
+                        columnHistoryInfo.Value = columns[i];
+                        analyzedFileInfo.FileHistory.Last().Columns.Add(columnHistoryInfo);
                         if (l == 0)
                         {
                             list.Add(new Dictionary<string, int>() { { columns[i], 1 } });
@@ -90,7 +107,7 @@ namespace AnalyzeFiles.Controllers
 
                 for (int i = 0; i < list.Count(); i++)
                 {
-                    analyzedFileInfo.Columns.Add(new AnalyzedColumnInfo(list[i].Count(), list[i].First(l => l.Value == list[i].Max(m => m.Value)).Key));
+                    analyzedFileInfo.Columns.Add(new AnalyzedColumnInfo(/*analyzedFileInfo.Id,*/ list[i].Count(), list[i].First(l => l.Value == list[i].Max(m => m.Value)).Key));
                 }                                
 
             }
@@ -99,21 +116,13 @@ namespace AnalyzeFiles.Controllers
                 analyzedFileInfo.Name = file;
                 analyzedFileInfo.IsFileCSV = false;                
             }
-            if(repository.AnalyzedFilesInfo.Any(f=>f.Name==file))
-            {
-                analyzedFileInfo.Id = repository.AnalyzedFilesInfo.First(f => f.Name == file).Id;
-                foreach(var c in analyzedFileInfo.Columns)
-                {
-                    c.AnalyzedFileInfoId = analyzedFileInfo.Id;
-                }
-            }
+            
             repository.SaveAnalyzedFileInfo(analyzedFileInfo);
             return analyzedFileInfo;
         }
 
         private bool IsFileCSV(string file)
-        {
-            var listSeparator = CultureInfo.CurrentCulture.TextInfo.ListSeparator.ToCharArray().First(); 
+        {            
             var lines  = System.IO.File.ReadAllLines(file);
             var firstLineColumnsCount = lines.First().Split(listSeparator).Count();
             foreach (var line in lines.Skip(1))
@@ -125,6 +134,36 @@ namespace AnalyzeFiles.Controllers
                 }
             }
             return true;
+        }
+
+        private bool IsFileChanged(string file)
+        {
+            if(IsFileCSV(file))
+            {
+                if (repository.AnalyzedFilesInfo.Any(f => f.Name == file))
+                {
+                    var lastFile = repository.AnalyzedFilesInfo.First(f => f.Name == file).FileHistory.OrderByDescending(f => f.Id).First().Columns.GroupBy(c => c.Position);
+                    var lastFileColumnsCount = lastFile.Count();
+                    var lastFileRowsCount = lastFile.First().Select(f => f.Position).Count();
+
+                    var newFileLines = System.IO.File.ReadAllLines(file);
+                    var newFileColumnsCount = newFileLines.First().Split(listSeparator).Count();
+                    var newFileRowsCount = newFileLines.Count();
+                    if (newFileColumnsCount == lastFileColumnsCount && newFileRowsCount == lastFileRowsCount)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    return true;
+                }                                                    
+            }
+            return false;
         }
     }
 }

@@ -11,13 +11,15 @@ namespace AnalyzeFiles.Domain.Entities
 		public AnalyzedFileInfo()
 		{
 			Columns = new List<AnalyzedColumnInfo>();
+			FileHistory = new List<AnalyzedFileHistoryInfo>();
 		}
 		public int Id { get; set; }			
 		public int Rows { get; set; }
 		public string Name { get; set; }
 		public bool IsFileCSV { get; set; }
 		public virtual ICollection<AnalyzedColumnInfo> Columns { get; set; }
-		
+		public virtual ICollection<AnalyzedFileHistoryInfo> FileHistory { get; set; }
+
 
 	}
 }

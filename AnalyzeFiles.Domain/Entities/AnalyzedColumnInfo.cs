@@ -17,8 +17,9 @@ namespace AnalyzeFiles.Domain.Entities
 		{
 
 		}
-		public AnalyzedColumnInfo(int uniqueValues, string maxFoundInems)
+		public AnalyzedColumnInfo(/*int analyzedFileInfoId, */int uniqueValues, string maxFoundInems)
 		{
+			//AnalyzedFileInfoId = analyzedFileInfoId;
 			UniqueValues = uniqueValues;
 			MaxFoundItems = maxFoundInems;
 		}

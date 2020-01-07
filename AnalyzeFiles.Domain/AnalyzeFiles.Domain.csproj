@@ -77,11 +77,17 @@
     <Compile Include="DataBase\AnalyzedColumnInfoRepository.cs" />
     <Compile Include="DataBase\AnalyzedFileInfoRepository.cs" />
     <Compile Include="DataBase\AnalyzedFilesDBContext.cs" />
+    <Compile Include="Entities\AnalyzedFileColumnHistoryInfo.cs" />
+    <Compile Include="Entities\AnalyzedFileHistoryInfo.cs" />
     <Compile Include="Entities\AnalyzedFileInfo.cs" />
     <Compile Include="Entities\AnalyzedColumnInfo.cs" />
     <Compile Include="Migrations\202001071646458_Initial.cs" />
     <Compile Include="Migrations\202001071646458_Initial.designer.cs">
       <DependentUpon>202001071646458_Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202001071948288_AddHistory.cs" />
+    <Compile Include="Migrations\202001071948288_AddHistory.designer.cs">
+      <DependentUpon>202001071948288_AddHistory.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -93,6 +99,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\202001071646458_Initial.resx">
       <DependentUpon>202001071646458_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001071948288_AddHistory.resx">
+      <DependentUpon>202001071948288_AddHistory.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
