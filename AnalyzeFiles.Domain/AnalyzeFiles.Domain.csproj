@@ -89,6 +89,10 @@
     <Compile Include="Migrations\202001071948288_AddHistory.designer.cs">
       <DependentUpon>202001071948288_AddHistory.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202001072158598_add_row.cs" />
+    <Compile Include="Migrations\202001072158598_add_row.designer.cs">
+      <DependentUpon>202001072158598_add_row.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -102,6 +106,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202001071948288_AddHistory.resx">
       <DependentUpon>202001071948288_AddHistory.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001072158598_add_row.resx">
+      <DependentUpon>202001072158598_add_row.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

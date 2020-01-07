@@ -13,6 +13,7 @@ namespace AnalyzeFiles.Domain.Entities
 		public int AnalyzedFileHistoryInfoId { get; set; }
 		public virtual AnalyzedFileHistoryInfo AnalyzedFileHistoryInfo { get; set; }
 		public int Position { get; set; }
+		public int Row { get; set; }
 		public string Value { get; set; }
 	}
 }

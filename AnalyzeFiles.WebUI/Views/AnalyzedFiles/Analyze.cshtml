@@ -30,6 +30,44 @@
 		{
 			<div>File is not in CSV format</div>
 		}
+
+		<h3>Changes in the file</h3>
+		if (item.FileHistory.Count() == 1)
+		{
+			<div>
+				newly created records are:
+				<ol>
+					@foreach (var rows in item.FileHistory.First().Columns.GroupBy(i => i.Row))
+					{
+						var value = string.Join("; ", rows.Select(r => r.Value));
+						<li>
+							@value;
+						</li>
+					}
+
+				</ol>
+			</div>
+		}
+		else
+		{
+			<div>
+				newly created records are:
+				<ol>
+					@{var rowsCount = item.FileHistory.OrderByDescending(f => f.Id).First().Columns.GroupBy(i => i.Row).Count();
+						var historyRowsCount = item.FileHistory.OrderByDescending(f => f.Id).Skip(1).First().Columns.GroupBy(i => i.Row).Count();
+						foreach (var rows in item.FileHistory.OrderByDescending(f => f.Id).First().Columns.GroupBy(i => i.Row).Skip(historyRowsCount))
+						{
+							var value = string.Join("; ", rows.Select(r => r.Value));
+							<li>
+								@value;
+							</li>
+						}
+					}
+
+				</ol>
+			</div>
+
+		}
 	}
 
 	<a href=@Url.Action("Index", "Home") title="Home">  <button>Home</button> </a>

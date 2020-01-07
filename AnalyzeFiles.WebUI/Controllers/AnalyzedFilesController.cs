@@ -84,6 +84,7 @@ namespace AnalyzeFiles.Controllers
                     for (int i = 0; i < columns.Count(); i++)
                     {
                         AnalyzedFileColumnHistoryInfo columnHistoryInfo = new AnalyzedFileColumnHistoryInfo();
+                        columnHistoryInfo.Row = l;
                         columnHistoryInfo.Position = i;
                         columnHistoryInfo.Value = columns[i];
                         analyzedFileInfo.FileHistory.Last().Columns.Add(columnHistoryInfo);
@@ -107,9 +108,8 @@ namespace AnalyzeFiles.Controllers
 
                 for (int i = 0; i < list.Count(); i++)
                 {
-                    analyzedFileInfo.Columns.Add(new AnalyzedColumnInfo(/*analyzedFileInfo.Id,*/ list[i].Count(), list[i].First(l => l.Value == list[i].Max(m => m.Value)).Key));
+                    analyzedFileInfo.Columns.Add(new AnalyzedColumnInfo(list[i].Count(), list[i].First(l => l.Value == list[i].Max(m => m.Value)).Key));
                 }                                
-
             }
             else
             {
