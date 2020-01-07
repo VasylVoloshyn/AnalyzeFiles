@@ -1,0 +1,36 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Web.Mvc;
+using Moq;
+using Ninject;
+using AnalyzeFiles.Domain.Abstract;
+using AnalyzeFiles.Domain.Entities;
+using AnalyzeFiles.Domain.DataBase;
+
+namespace AnalyzeFiles.WebUI.Infrastructure
+{
+	public class NinjectDependencyResolver : IDependencyResolver
+	{
+		private IKernel kernel;
+		public NinjectDependencyResolver(IKernel kernelParam)
+		{
+			kernel = kernelParam;
+			AddBindings();
+		}
+		
+		public object GetService(Type serviceType)
+		{
+			return kernel.TryGet(serviceType);
+		}
+
+		public IEnumerable<object> GetServices(Type serviceType)
+		{
+			return kernel.GetAll(serviceType);
+		}
+		private void AddBindings()
+		{
+			kernel.Bind<IAnalyzedFileInfoRepository>().To<AnalyzedFileInfoRepository>();
+			kernel.Bind<IAnalyzedColumnInfoRepository>().To<AnalyzedColumnInfoRepository>();
+		}
+	}
+}

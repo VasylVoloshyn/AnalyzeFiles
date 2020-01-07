@@ -1,0 +1,36 @@
+﻿@model IEnumerable<AnalyzeFiles.Domain.Entities.AnalyzedFileInfo>
+@{
+	ViewBag.Title = "Analyzed Files";
+	Layout = "~/Views/_BasicLayout.cshtml";
+}
+
+<body>
+	@foreach (var item in Model)
+	{
+		<h2>@item.Name</h2>
+		if (item.IsFileCSV)
+		{
+			<div>
+				Number of columns in the file <b> @item.Columns.Count()</b>
+				<br />
+				Number of rows in the file <b> @item.Rows.ToString()</b>
+			</div>
+			<ol>
+				@foreach (var column in item.Columns)
+				{
+					<li>
+						Column have <b>@column.UniqueValues</b> unique values. <br />
+						Max occurrences in the column is <b>@column.MaxFoundItems</b>
+					</li>
+
+				}
+			</ol>
+		}
+		else
+		{
+			<div>File is not in CSV format</div>
+		}
+	}
+
+	<a href=@Url.Action("Index", "Home") title="Home">  <button>Home</button> </a>
+</body>

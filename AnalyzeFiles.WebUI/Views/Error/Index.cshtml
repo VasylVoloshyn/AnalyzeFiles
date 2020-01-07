@@ -1,0 +1,12 @@
+﻿@model AnalyzeFiles.Models.ErrorModel
+@{
+	ViewBag.Title = "Error Page";
+	Layout = "~/Views/_BasicLayout.cshtml";
+}
+
+<body>
+	<div>
+		@Model.ErrorText
+	</div>
+	<a href=@Url.Action("Index", "Home") title="Analyze">  <button>Home</button> </a>
+</body>
