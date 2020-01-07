@@ -16,7 +16,7 @@ namespace AnalyzeFiles.Domain.DataBase
 		{
 			if(columnInfo.Id ==0)
 			{
-				context.AnalyzedColumnInfo.Add(columnInfo);
+				context.AnalyzedColumnInfo.Add(columnInfo);				
 			}
 			else
 			{

@@ -13,9 +13,44 @@ namespace AnalyzeFiles.Domain.DataBase
 		private AnalyzedFilesDBContext context = new AnalyzedFilesDBContext();
 		public IEnumerable<AnalyzedFileInfo> AnalyzedFilesInfo { get { return context.AnalyzedFilesInfo; } }
 
-		public void SaveAnalyzedFileInfo(AnalyzedFileInfo columnInfo)
+		public void SaveAnalyzedFileInfo(AnalyzedFileInfo fileInfo)
 		{
-			throw new NotImplementedException();
+			if (fileInfo.Id == 0)
+			{
+				context.AnalyzedFilesInfo.Add(fileInfo);
+				foreach(var column in fileInfo.Columns)
+				{
+					context.AnalyzedColumnInfo.Add(column);					
+				}
+			}
+			else
+			{
+				var entity = context.AnalyzedFilesInfo.Find(fileInfo.Id);
+				if (entity != null)
+				{
+					entity.IsFileCSV = fileInfo.IsFileCSV;
+					entity.Name = fileInfo.Name;
+					entity.Rows = fileInfo.Rows;
+				}
+				foreach (var column in fileInfo.Columns)
+				{
+					if (column.Id == 0)
+					{
+						context.AnalyzedColumnInfo.Add(column);
+					}
+					else
+					{
+						var columnEntity = context.AnalyzedColumnInfo.Find(column.Id);
+						if (columnEntity != null)
+						{
+							columnEntity.AnalyzedFileInfoId = column.AnalyzedFileInfoId;
+							columnEntity.MaxFoundItems = column.MaxFoundItems;
+							columnEntity.UniqueValues = column.UniqueValues;
+						}
+					}
+				}
+			}
+			context.SaveChanges();
 		}
 	}
 }

@@ -92,13 +92,14 @@ namespace AnalyzeFiles.Controllers
                 {
                     analyzedFileInfo.Columns.Add(new AnalyzedColumnInfo(list[i].Count(), list[i].First(l => l.Value == list[i].Max(m => m.Value)).Key));
                 }                                
+
             }
             else
             {
                 analyzedFileInfo.Name = file;
                 analyzedFileInfo.IsFileCSV = false;                
             }
-
+            repository.SaveAnalyzedFileInfo(analyzedFileInfo);
             return analyzedFileInfo;
         }
 
