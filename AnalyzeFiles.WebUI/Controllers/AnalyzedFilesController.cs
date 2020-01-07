@@ -99,6 +99,14 @@ namespace AnalyzeFiles.Controllers
                 analyzedFileInfo.Name = file;
                 analyzedFileInfo.IsFileCSV = false;                
             }
+            if(repository.AnalyzedFilesInfo.Any(f=>f.Name==file))
+            {
+                analyzedFileInfo.Id = repository.AnalyzedFilesInfo.First(f => f.Name == file).Id;
+                foreach(var c in analyzedFileInfo.Columns)
+                {
+                    c.AnalyzedFileInfoId = analyzedFileInfo.Id;
+                }
+            }
             repository.SaveAnalyzedFileInfo(analyzedFileInfo);
             return analyzedFileInfo;
         }

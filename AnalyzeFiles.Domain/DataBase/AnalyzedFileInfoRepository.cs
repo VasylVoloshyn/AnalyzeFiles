@@ -31,6 +31,11 @@ namespace AnalyzeFiles.Domain.DataBase
 					entity.IsFileCSV = fileInfo.IsFileCSV;
 					entity.Name = fileInfo.Name;
 					entity.Rows = fileInfo.Rows;
+					var columnsToDelete = context.AnalyzedColumnInfo.Where(c => c.AnalyzedFileInfoId == fileInfo.Id).ToArray();
+					foreach(var col in columnsToDelete)
+					{
+						context.AnalyzedColumnInfo.Remove(col);
+					}
 				}
 				foreach (var column in fileInfo.Columns)
 				{
@@ -38,6 +43,7 @@ namespace AnalyzeFiles.Domain.DataBase
 					{
 						context.AnalyzedColumnInfo.Add(column);
 					}
+
 					else
 					{
 						var columnEntity = context.AnalyzedColumnInfo.Find(column.Id);
