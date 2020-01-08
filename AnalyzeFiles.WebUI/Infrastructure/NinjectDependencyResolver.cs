@@ -29,8 +29,7 @@ namespace AnalyzeFiles.WebUI.Infrastructure
 		}
 		private void AddBindings()
 		{
-			kernel.Bind<IAnalyzedFileInfoRepository>().To<AnalyzedFileInfoRepository>();
-			kernel.Bind<IAnalyzedColumnInfoRepository>().To<AnalyzedColumnInfoRepository>();
+			kernel.Bind<IAnalyzedFileInfoRepository>().To<AnalyzedFileInfoRepository>();			
 		}
 	}
 }

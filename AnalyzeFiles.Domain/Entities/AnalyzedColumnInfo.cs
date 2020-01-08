@@ -13,10 +13,7 @@ namespace AnalyzeFiles.Domain.Entities
 		public virtual AnalyzedFileInfo AnalyzedFileInfo { get; set; }		
 		public int UniqueValues { get; set; }
 		public string MaxFoundItems { get; set; }
-		public AnalyzedColumnInfo()
-		{
-
-		}
+		public AnalyzedColumnInfo() {}
 		public AnalyzedColumnInfo(int uniqueValues, string maxFoundInems)
 		{			
 			UniqueValues = uniqueValues;

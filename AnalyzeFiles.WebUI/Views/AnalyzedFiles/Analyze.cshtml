@@ -4,40 +4,69 @@
 	Layout = "~/Views/_BasicLayout.cshtml";
 }
 
-	<body>
-		@foreach (var item in Model)
+<body>
+	@foreach (var item in Model)
+	{
+		<h2>@item.Name</h2>
+		if (item.IsFileCSV)
 		{
-			<h2>@item.Name</h2>
-			if (item.IsFileCSV)
-			{
-				<div>
-					Number of columns in the file <b> @item.Columns.Count()</b>
-					<br />
-					Number of rows in the file <b> @item.Rows.ToString()</b>
-				</div>
-				<ol>
-					@foreach (var column in item.Columns)
-					{
-						<li>
-							Column have <b>@column.UniqueValues</b> unique values. <br />
-							Max occurrences in the column is <b>@column.MaxFoundItems</b>
-						</li>
+			<div>
+				Number of columns in the file <b> @item.Columns.Count()</b>
+				<br />
+				Number of rows in the file <b> @item.Rows.ToString()</b>
+			</div>
+			<ol>
+				@foreach (var column in item.Columns)
+				{
+					<li>
+						Column have <b>@column.UniqueValues</b> unique values. <br />
+						Max occurrences in the column is <b>@column.MaxFoundItems</b>
+					</li>
 
+				}
+			</ol>
+		}
+		else
+		{
+			<div>File is not in CSV format</div>
+		}
+
+		<h3>Changes in the file</h3>
+		if (item.FileHistory.Count() == 1)
+		{
+			<div>
+				Newly created records are:
+				<ol>
+					@foreach (var rows in item.FileHistory.First().Columns.GroupBy(i => i.Row))
+					{
+						var value = string.Join("; ", rows.Select(r => r.Value));
+						<li>
+							@value;
+						</li>
 					}
 				</ol>
-			}
-			else
-			{
-				<div>File is not in CSV format</div>
-			}
-
-			<h3>Changes in the file</h3>
-			if (item.FileHistory.Count() == 1)
+				Added columns are:
+				<ol>
+					@foreach (var columns in item.FileHistory.First().Columns.GroupBy(i => i.Position))
+					{
+						var value = string.Join("; ", columns.Select(r => r.Value));
+						<li>
+							@value;
+						</li>
+					}
+				</ol>
+			</div>
+		}
+		else
+		{
+			var rowsCount = item.FileHistory.OrderByDescending(f => f.Id).First().Columns.GroupBy(i => i.Row).Count();
+			var historyRowsCount = item.FileHistory.OrderByDescending(f => f.Id).Skip(1).First().Columns.GroupBy(i => i.Row).Count();
+			if (rowsCount > historyRowsCount)
 			{
 				<div>
 					Newly created records are:
 					<ol>
-						@foreach (var rows in item.FileHistory.First().Columns.GroupBy(i => i.Row))
+						@foreach (var rows in item.FileHistory.OrderByDescending(f => f.Id).First().Columns.GroupBy(i => i.Row).Skip(historyRowsCount))
 						{
 							var value = string.Join("; ", rows.Select(r => r.Value));
 							<li>
@@ -45,9 +74,23 @@
 							</li>
 						}
 					</ol>
-					Added columns are:
+				</div>
+			}
+			else
+			{
+				<div>
+					There were no new records created.
+				</div>
+			}
+
+			var columnsCount = item.FileHistory.OrderByDescending(f => f.Id).First().Columns.GroupBy(i => i.Position).Count();
+			var historyColumnsCount = item.FileHistory.OrderByDescending(f => f.Id).Skip(1).First().Columns.GroupBy(i => i.Row).Count();
+			if (columnsCount > historyRowsCount)
+			{
+				<div>
+					Newly created columns are:
 					<ol>
-						@foreach (var columns in item.FileHistory.First().Columns.GroupBy(i => i.Position))
+						@foreach (var columns in item.FileHistory.OrderByDescending(f => f.Id).First().Columns.GroupBy(i => i.Position).Skip(historyRowsCount))
 						{
 							var value = string.Join("; ", columns.Select(r => r.Value));
 							<li>
@@ -57,74 +100,30 @@
 					</ol>
 				</div>
 			}
+			else if (columnsCount == historyRowsCount)
+			{
+				<div>
+					Where were no either created new column or removed new column
+				</div>
+			}
 			else
 			{
-				var rowsCount = item.FileHistory.OrderByDescending(f => f.Id).First().Columns.GroupBy(i => i.Row).Count();
-				var historyRowsCount = item.FileHistory.OrderByDescending(f => f.Id).Skip(1).First().Columns.GroupBy(i => i.Row).Count();
-				if (rowsCount > historyRowsCount)
-				{
-					<div>
-						Newly created records are:
-						<ol>
-							@foreach (var rows in item.FileHistory.OrderByDescending(f => f.Id).First().Columns.GroupBy(i => i.Row).Skip(historyRowsCount))
-							{
-								var value = string.Join("; ", rows.Select(r => r.Value));
-								<li>
-									@value;
-								</li>
-							}
-						</ol>
-					</div>
-				}
-				else
-				{
-					<div>
-						There were no new records created.
-					</div>
-				}
-
-				var columnsCount = item.FileHistory.OrderByDescending(f => f.Id).First().Columns.GroupBy(i => i.Position).Count();
-				var historyColumnsCount = item.FileHistory.OrderByDescending(f => f.Id).Skip(1).First().Columns.GroupBy(i => i.Row).Count();
-				if (columnsCount > historyRowsCount)
-				{
-					<div>
-						Newly created columns are:
-						<ol>
-							@foreach (var columns in item.FileHistory.OrderByDescending(f => f.Id).First().Columns.GroupBy(i => i.Position).Skip(historyRowsCount))
-							{
-								var value = string.Join("; ", columns.Select(r => r.Value));
-								<li>
-									@value;
-								</li>
-							}
-						</ol>
-					</div>
-				}
-				else if (columnsCount == historyRowsCount)
-				{
-					<div>
-						Where were no either created new column or removed new column
-					</div>
-				}
-				else
-				{
-					<div>
-						These columns were removed
-						<ol>
-							@foreach (var columns in item.FileHistory.OrderByDescending(f => f.Id).Skip(1).First().Columns.GroupBy(i => i.Position).Skip(columnsCount))
-							{
-								var value = string.Join("; ", columns.Select(r => r.Value));
-								<li>
-									@value;
-								</li>
-							}
-						</ol>
-					</div>
-				}
+				<div>
+					These columns were removed
+					<ol>
+						@foreach (var columns in item.FileHistory.OrderByDescending(f => f.Id).Skip(1).First().Columns.GroupBy(i => i.Position).Skip(columnsCount))
+						{
+							var value = string.Join("; ", columns.Select(r => r.Value));
+							<li>
+								@value;
+							</li>
+						}
+					</ol>
+				</div>
 			}
 		}
+	}
 
-
-		<a href=@Url.Action("Index", "Home") title="Home">  <button>Home</button></a>
-		<a href=@Url.Action("Index", "AnalyzedFiles") title="Analyze">  <button>Analyze Page</button></a>
-	</body>
+	<a href=@Url.Action("Index", "Home") title="Home">  <button>Home</button></a>
+	<a href=@Url.Action("Index", "AnalyzedFiles") title="Analyze">  <button>Analyze Page</button></a>
+</body>

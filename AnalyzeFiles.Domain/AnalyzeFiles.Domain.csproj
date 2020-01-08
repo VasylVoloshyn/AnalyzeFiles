@@ -72,9 +72,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Abstract\IAnalyzedColumnInfoRepository.cs" />
     <Compile Include="Abstract\IAnalyzedFileInfoRepository.cs" />
-    <Compile Include="DataBase\AnalyzedColumnInfoRepository.cs" />
     <Compile Include="DataBase\AnalyzedFileInfoRepository.cs" />
     <Compile Include="DataBase\AnalyzedFilesDBContext.cs" />
     <Compile Include="Entities\AnalyzedFileColumnHistoryInfo.cs" />

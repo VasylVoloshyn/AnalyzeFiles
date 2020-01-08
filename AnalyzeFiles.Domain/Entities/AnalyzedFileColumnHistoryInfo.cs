@@ -8,8 +8,7 @@ namespace AnalyzeFiles.Domain.Entities
 {
 	public class AnalyzedFileColumnHistoryInfo
 	{
-		public int Id { get; set; }
-		
+		public int Id { get; set; }		
 		public int AnalyzedFileHistoryInfoId { get; set; }
 		public virtual AnalyzedFileHistoryInfo AnalyzedFileHistoryInfo { get; set; }
 		public int Position { get; set; }
