@@ -6,12 +6,19 @@
 
 	<body>
 		<div>
-			Files will be here
+			There are 2 action on this page.<br />
+			Please press Analyze button to do Analyze for new Files added to the Folder or Files that have been changed after last Anlayze.<br />
+			During analyzre information about analyzed fileas is saving in the database.<br />
+			Please press Analyzed Files List to see Analyze of files that have been already saved to the database.<br />
+
+			Here is design of database where anayze of files is stored<br />
+
+			<img src="~/Images/database.jpg" alt="Database">
 		</div>
 		<br />
-		<a href=@Url.Action("Analyze", "AnalyzedFiles") title="Analyze">  <button>Analyze</button> </a>
-		<br />
-		<a href=@Url.Action("AnalyzedFileList", "AnalyzedFiles") title="Analyzed Files">  <button>Analyzed File List</button> </a>
-		<br />
+		<a href=@Url.Action("Analyze", "AnalyzedFiles") title="Analyze"> <button>Analyze</button></a>
+		
+		<a href=@Url.Action("AnalyzedFileList", "AnalyzedFiles") title="Analyzed Files">  <button>Analyzed Files List</button></a>
+		
 		<a href=@Url.Action("Index", "Home") title="Home">  <button>Home</button> </a>
 	</body>

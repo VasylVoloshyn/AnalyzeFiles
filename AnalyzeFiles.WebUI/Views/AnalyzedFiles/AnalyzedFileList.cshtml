@@ -4,27 +4,28 @@
     Layout = "~/Views/_BasicLayout.cshtml";
 }
 
-<body>
-    @foreach (var item in Model)
-    {
+    <body>
+        @foreach (var item in Model)
+        {
 
-        <h2>@item.Name</h2>
-        <div>
-            Number of columns in the file <b> @item.Columns.Count()</b>
-            <br />
-            Number of rows in the file <b> @item.Rows.ToString()</b>
-        </div>
-        <ol>
-            @foreach (var column in item.Columns)
-            {
-                <li>
-                    Column have <b>@column.UniqueValues</b> unique values. <br />
-                    Max occurrences in the column is <b>@column.MaxFoundItems</b>
-                </li>
+            <h2>@item.Name</h2>
+            <div>
+                Number of columns in the file <b> @item.Columns.Count()</b>
+                <br />
+                Number of rows in the file <b> @item.Rows.ToString()</b>
+            </div>
+            <ol>
+                @foreach (var column in item.Columns)
+                {
+                    <li>
+                        Column have <b>@column.UniqueValues</b> unique values. <br />
+                        Max occurrences in the column is <b>@column.MaxFoundItems</b>
+                    </li>
 
-            }
-        </ol>
-    }
+                }
+            </ol>
+        }
 
-    <a href=@Url.Action("Index", "Home") title="Home">  <button>Home</button> </a>
-</body>
+        <a href=@Url.Action("Index", "Home") title="Home">  <button>Home</button></a>
+        <a href=@Url.Action("Index", "AnalyzedFiles") title="Analyze">  <button>Analyze Page</button></a>
+    </body>

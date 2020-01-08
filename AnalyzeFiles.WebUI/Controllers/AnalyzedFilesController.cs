@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Web.Mvc;
+using AnalyzeFiles.Models;
 
 namespace AnalyzeFiles.Controllers
 {
@@ -28,8 +29,18 @@ namespace AnalyzeFiles.Controllers
         }
 
         public ActionResult Analyze()
-        {            
-            var model = AnalyzeFilesInFolder();
+        {
+            List<AnalyzedFileInfo> model = new List<AnalyzedFileInfo>();
+            try
+            {
+                model = AnalyzeFilesInFolder();
+            }
+            catch (Exception ex)
+            {
+                var errorModel = new ErrorModel();
+                errorModel.ErrorText = "ERROR:" + ex.Message.ToString();
+                return RedirectToAction("Index", "Error", errorModel);
+            }
             
             return View(model);
         }
@@ -40,128 +51,158 @@ namespace AnalyzeFiles.Controllers
         }
 
         private List<AnalyzedFileInfo> AnalyzeFilesInFolder()
-        {
+        {            
             List<AnalyzedFileInfo> filesInfo = new List<AnalyzedFileInfo>();
-            if (Directory.Exists(filesLocation))
-            {                
-                var files = Directory.GetFiles(filesLocation);
-                foreach(var file in files)
+            try
+            {
+                if (Directory.Exists(filesLocation))
                 {
-                    if (IsFileChanged(file))
+                    var files = Directory.GetFiles(filesLocation);
+                    foreach (var file in files)
                     {
-                        filesInfo.Add(AnalyzeFile(file));
-                    }                    
+                        if (IsFileChanged(file))
+                        {
+                            filesInfo.Add(AnalyzeFile(file));
+                        }
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
             return filesInfo;
         }
 
         private AnalyzedFileInfo AnalyzeFile(string file)
         {
             AnalyzedFileInfo analyzedFileInfo = new AnalyzedFileInfo();
-            if (repository.AnalyzedFilesInfo.Any(f => f.Name == file))
+            try
             {
-                analyzedFileInfo = repository.AnalyzedFilesInfo.First(f => f.Name == file);
-            }
-               
-            if (IsFileCSV(file))
-            {                
-                var history = new AnalyzedFileHistoryInfo();
-                history.CreatedDate = DateTime.Now;
-
-                var lines = System.IO.File.ReadAllLines(file);                
-                analyzedFileInfo.Name = file;
-                analyzedFileInfo.IsFileCSV = true;
-                analyzedFileInfo.Rows = lines.Count();
-                analyzedFileInfo.FileHistory.Add(history);
-
-                List<Dictionary<string, int>> list = new List<Dictionary<string, int>>();
-                
-                for (int l = 0; l < lines.Count(); l++)
+                if (repository.AnalyzedFilesInfo.Any(f => f.Name == file))
                 {
-                    
-                    var columns = lines[l].Split(listSeparator);
-                    for (int i = 0; i < columns.Count(); i++)
+                    analyzedFileInfo = repository.AnalyzedFilesInfo.First(f => f.Name == file);
+                }
+
+                if (IsFileCSV(file))
+                {
+                    var history = new AnalyzedFileHistoryInfo();
+                    history.CreatedDate = DateTime.Now;
+
+                    var lines = System.IO.File.ReadAllLines(file);
+                    analyzedFileInfo.Name = file;
+                    analyzedFileInfo.IsFileCSV = true;
+                    analyzedFileInfo.Rows = lines.Count();
+                    analyzedFileInfo.FileHistory.Add(history);
+
+                    List<Dictionary<string, int>> list = new List<Dictionary<string, int>>();
+
+                    for (int l = 0; l < lines.Count(); l++)
                     {
-                        AnalyzedFileColumnHistoryInfo columnHistoryInfo = new AnalyzedFileColumnHistoryInfo();
-                        columnHistoryInfo.Row = l;
-                        columnHistoryInfo.Position = i;
-                        columnHistoryInfo.Value = columns[i];
-                        analyzedFileInfo.FileHistory.Last().Columns.Add(columnHistoryInfo);
-                        if (l == 0)
+
+                        var columns = lines[l].Split(listSeparator);
+                        for (int i = 0; i < columns.Count(); i++)
                         {
-                            list.Add(new Dictionary<string, int>() { { columns[i], 1 } });
-                        }
-                        else
-                        {
-                            if (!list[i].ContainsKey(columns[i]))
+                            AnalyzedFileColumnHistoryInfo columnHistoryInfo = new AnalyzedFileColumnHistoryInfo();
+                            columnHistoryInfo.Row = l;
+                            columnHistoryInfo.Position = i;
+                            columnHistoryInfo.Value = columns[i];
+                            analyzedFileInfo.FileHistory.Last().Columns.Add(columnHistoryInfo);
+                            if (l == 0)
                             {
-                                list[i].Add(columns[i], 1);
+                                list.Add(new Dictionary<string, int>() { { columns[i], 1 } });
                             }
                             else
                             {
-                                list[i][columns[i]]++;
+                                if (!list[i].ContainsKey(columns[i]))
+                                {
+                                    list[i].Add(columns[i], 1);
+                                }
+                                else
+                                {
+                                    list[i][columns[i]]++;
+                                }
                             }
                         }
                     }
+
+                    for (int i = 0; i < list.Count(); i++)
+                    {
+                        analyzedFileInfo.Columns.Add(new AnalyzedColumnInfo(list[i].Count(), list[i].First(l => l.Value == list[i].Max(m => m.Value)).Key));
+                    }
+                }
+                else
+                {
+                    analyzedFileInfo.Name = file;
+                    analyzedFileInfo.IsFileCSV = false;
                 }
 
-                for (int i = 0; i < list.Count(); i++)
-                {
-                    analyzedFileInfo.Columns.Add(new AnalyzedColumnInfo(list[i].Count(), list[i].First(l => l.Value == list[i].Max(m => m.Value)).Key));
-                }                                
+                repository.SaveAnalyzedFileInfo(analyzedFileInfo);
             }
-            else
+            catch (Exception ex)
             {
-                analyzedFileInfo.Name = file;
-                analyzedFileInfo.IsFileCSV = false;                
+                throw ex;
             }
-            
-            repository.SaveAnalyzedFileInfo(analyzedFileInfo);
             return analyzedFileInfo;
         }
 
         private bool IsFileCSV(string file)
-        {            
-            var lines  = System.IO.File.ReadAllLines(file);
-            var firstLineColumnsCount = lines.First().Split(listSeparator).Count();
-            foreach (var line in lines.Skip(1))
+        {
+            try
             {
-                var columnsCount = line.Split(listSeparator).Count();
-                if (firstLineColumnsCount != columnsCount)
+                var lines = System.IO.File.ReadAllLines(file);
+                var firstLineColumnsCount = lines.First().Split(listSeparator).Count();
+                foreach (var line in lines.Skip(1))
                 {
-                    return false;
+                    var columnsCount = line.Split(listSeparator).Count();
+                    if (firstLineColumnsCount != columnsCount)
+                    {
+                        return false;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+                
             }
             return true;
         }
 
         private bool IsFileChanged(string file)
         {
-            if(IsFileCSV(file))
+            try
             {
-                if (repository.AnalyzedFilesInfo.Any(f => f.Name == file))
+                if (IsFileCSV(file))
                 {
-                    var lastFile = repository.AnalyzedFilesInfo.First(f => f.Name == file).FileHistory.OrderByDescending(f => f.Id).First().Columns.GroupBy(c => c.Position);
-                    var lastFileColumnsCount = lastFile.Count();
-                    var lastFileRowsCount = lastFile.First().Select(f => f.Position).Count();
-
-                    var newFileLines = System.IO.File.ReadAllLines(file);
-                    var newFileColumnsCount = newFileLines.First().Split(listSeparator).Count();
-                    var newFileRowsCount = newFileLines.Count();
-                    if (newFileColumnsCount == lastFileColumnsCount && newFileRowsCount == lastFileRowsCount)
+                    if (repository.AnalyzedFilesInfo.Any(f => f.Name == file))
                     {
-                        return false;
+                        var lastFile = repository.AnalyzedFilesInfo.First(f => f.Name == file).FileHistory.OrderByDescending(f => f.Id).First().Columns.GroupBy(c => c.Position);
+                        var lastFileColumnsCount = lastFile.Count();
+                        var lastFileRowsCount = lastFile.First().Select(f => f.Position).Count();
+
+                        var newFileLines = System.IO.File.ReadAllLines(file);
+                        var newFileColumnsCount = newFileLines.First().Split(listSeparator).Count();
+                        var newFileRowsCount = newFileLines.Count();
+                        if (newFileColumnsCount == lastFileColumnsCount && newFileRowsCount == lastFileRowsCount)
+                        {
+                            return false;
+                        }
+                        else
+                        {
+                            return true;
+                        }
                     }
                     else
                     {
                         return true;
                     }
                 }
-                else
-                {
-                    return true;
-                }                                                    
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
             return false;
         }

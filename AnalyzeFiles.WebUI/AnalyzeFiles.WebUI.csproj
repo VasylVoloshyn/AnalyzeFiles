@@ -122,7 +122,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Data\AnalyzeFilesDB.mdf" />
+    <Content Include="App_Data\AnalyzeFilesDB_log.ldf">
+      <DependentUpon>AnalyzeFilesDB.mdf</DependentUpon>
+    </Content>
     <Content Include="Global.asax" />
+    <Content Include="Images\database.jpg" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -154,9 +159,7 @@
       <DependentUpon>Web.config</DependentUpon>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App_Data\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\AnalyzeFiles.Domain\AnalyzeFiles.Domain.csproj">
       <Project>{02a28f93-f715-405a-90c5-7231d6bbcad0}</Project>

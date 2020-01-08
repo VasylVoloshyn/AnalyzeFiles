@@ -3,20 +3,22 @@
 	Layout = "~/Views/_BasicLayout.cshtml";
 }
 
-<div>
-	<h2>Load file</h2>
-</div>
+	<div>
+		This is simple web site which analyze csv files located in specific folder.<br />
+		You can set up that folder in web.config. You need to change "filesLocationFolder" key. By default it is set up to "C:\Files"<br />
+		You can upoad selected file to that folder by pressing Upload button
 
-@using (Html.BeginForm("Index",
-						"Home",
-						FormMethod.Post,
-						new { enctype = "multipart/form-data" }))
-{
-	<label for="file">Upload File:</label>
-	<input type="file" name="file" id="file" />
-	<br>
-	<input type="submit" value="Upload File" />
-	<br>
-}
+		@using (Html.BeginForm("Index",
+								"Home",
+								FormMethod.Post,
+								new { enctype = "multipart/form-data" }))
+		{
+			<label for="file">Upload File:</label>
+			<input type="file" name="file" id="file" />
+			<br>
+			<input type="submit" value="Upload File" />
+			<br><br />
+		}
 
-<a href=@Url.Action("Index", "AnalyzedFiles") title="Analyze">  <button>Analyze Files</button> </a>
+		Please go to <a href=@Url.Action("Index", "AnalyzedFiles") title="Analyze">  <button>Analyze Page</button></a> to do analyze of the files in that folder
+	</div>
